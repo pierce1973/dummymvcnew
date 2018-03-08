@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
@@ -26,9 +25,9 @@ public class NoteServiceTest {
      * Define a test Note Service bean which is injected below
      */
     @TestConfiguration
-    static class NoteServiceImplTestConfiguration{
+    static class NoteServiceImplTestConfiguration {
         @Bean
-        public NoteService noteService(){
+        public NoteService noteService() {
             return new NoteServiceImpl();
         }
     }
@@ -39,15 +38,18 @@ public class NoteServiceTest {
     @MockBean
     private NoteRepository noteRepository;
 
+    private List<Note> notes;
+
     @Before
-    public void setup(){
-        List<Note> notes = new ArrayList<>();
+    public void setup() {
+        notes = new ArrayList<>();
         Note note = new Note();
         note.setTitle("MyTitle");
         note.setContent("MyContent");
         notes.add(note);
 
         when(noteRepository.findByTitle("MyTitle")).thenReturn(notes);
+        when(noteRepository.findAll()).thenReturn(notes);
     }
 
 
@@ -56,5 +58,11 @@ public class NoteServiceTest {
         List<Note> foundNotes = noteService.getNotesByTitle("MyTitle");
         assertThat(foundNotes.get(0).getTitle()).isEqualTo("MyTitle");
 
+    }
+
+    @Test
+    public void whenGetAllNotesThenListReturned() {
+        List<Note> foundNotes = noteService.getAllNotes();
+        assertThat(foundNotes).isEqualTo(notes);
     }
 }
